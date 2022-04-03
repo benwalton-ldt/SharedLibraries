@@ -1,32 +1,15 @@
-//@Library('LibraryName') _ 
-// Declarative pipeline
-
-@Library('LandmarkSS-sharedlibs') _
-pipeline {
-agent any 
-tools {
-    maven "maven3.8.5"
-  }
-stages{
-stage('CheckoutCode'){
-  steps{
-    git 'https://github.com/LandmakTechnology/paypal-web-app'
-}
-}
-stage("Build"){ 
-  steps{
-    common("Build")  
-}
-}
-stage("Execute SonarQube Report"){ 
-  steps{
-    common("SonarQube Report")
-}
-}
-stage("Upload Artifacts Into Nexus"){ 
-  steps{
-    common("Upload Into Nexus")
-}
-}
-}
+def call(String stageName){
+  if ("${stageName}" == "Build")
+     {
+       sh "mvn clean package"
+     }
+  else if ("${stageName}" == "SonarQube Report")
+     {
+       sh "echo Running Code Quality Report analysis"
+       sh "mvn clean sonar:sonar"
+     }
+  else if ("${stageName}" == "Upload Into Nexus")
+     {
+       sh "mvn clean deploy"
+     }
 }
